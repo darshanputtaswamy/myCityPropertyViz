@@ -3,7 +3,7 @@
 import Image from "next/image";
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 
-import  data from "./data.json"
+import data from "./data.json" 
 import Pin from '../component/Pin';
 import PlotDetails from '../component/Popup'
 import Map, {
