@@ -16,7 +16,7 @@ const  PlotDetails = ({ data}: any) => {
       plotArea={data.plotArea}
       plotWidth={data.plotWidth}
       plotLength={data.plotLength}
-      khataCertificateType={data.aea__.KHATA_CERTIFICATE_TYPE.display_value}
+      khataCertificateType={data.aea__?.KHATA_CERTIFICATE_TYPE?.display_value}
       ownerDescription={data.ownerDescription}
     />
   </div>

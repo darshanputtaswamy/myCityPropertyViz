@@ -7,7 +7,7 @@ const PhotoSlideshow = ({ id, photos }:any) => (
     <Carousel infiniteLoop useKeyboardArrows autoPlay showThumbs={false}>
       {photos.map((photo:any, index:any) => (
         <div key={index}>
-          <img src={"https://images.nobroker.in/images/"+ id + '/'+ photo.imagesMap.large} alt={photo.title} className="w-full h-96 object-cover" />
+          <img src={"https://images.nobroker.in/images/"+ id + '/'+ photo.imagesMap.large} alt={photo.title} className="object-cover" />
         </div>
       ))}
     </Carousel>

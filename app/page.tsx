@@ -53,7 +53,7 @@ export default function Home() {
     <>
       <Map
         initialViewState={viewport}
-        mapStyle="mapbox://styles/mapbox/streets-v12"
+        mapStyle="mapbox://styles/mapbox/dark-v9"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
         style={{ width: '100vw', height: '100vh' }}
       >
