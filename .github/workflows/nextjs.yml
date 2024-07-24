@@ -11,9 +11,6 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-env: 
-  NEXT_PUBLIC_MAPBOX_TOKEN: ${{ vars.NEXT_PUBLIC_MAPBOX_TOKEN }}
-  
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
@@ -31,9 +28,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Reading a secrets
-        run: echo "Reading secret ${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }}"
-        
       - name: Checkout
         uses: actions/checkout@v4
       - name: Detect package manager
@@ -78,10 +72,12 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
+      - name: Reading a environment variable from github repo
+        run: echo "Reading variable ${{ vars.NEXT_PUBLIC_MAPBOX_TOKEN }}"
       - name: create .env file 
         run: |
-          touch .env.local
-          echo NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }} >> .env.local
+          touch .env
+          echo NEXT_PUBLIC_MAPBOX_TOKEN=${{ vars.NEXT_PUBLIC_MAPBOX_TOKEN }} >> .env.local
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
       - name: Upload artifact
