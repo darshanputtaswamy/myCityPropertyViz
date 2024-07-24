@@ -3,8 +3,8 @@
 import Image from "next/image";
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { NextUIProvider, Button } from "@nextui-org/react";
-import properties from "../app/data.json"
-import Pin from './Pin';
+
+import Pin from './Icons/PinIcon';
 import PlotDetails from './Popup'
 import Map, {
   Marker,
@@ -16,8 +16,8 @@ import Map, {
 } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import ControlPanel from './ControlPanel';
-import FilterIcon from './FilterIcon'; // Adjust the path as necessary
-import CloseIcon from './CloseIcon';   // Adjust the path as necessary
+import FilterIcon from './Icons/FilterIcon'; // Adjust the path as necessary
+import CloseIcon from './Icons/CloseIcon';   // Adjust the path as necessary
 import { useData } from './Datacontext';
 
 export default function MapView() {
@@ -30,23 +30,9 @@ export default function MapView() {
   const [popupInfo, setPopupInfo] = useState<any>(null);
   const [filter, setOpenFilter] = useState<any>(false);
   const { state } = useData();
-
-  const data = useMemo(() => {
-    return properties.filter(property => {
-      // Filter conditions based on minPrice, maxPrice, minArea, maxArea
-      let price = property.price >= state.minPrice && property.price <= state.maxPrice 
-      let area = property.plotArea >= state.minArea && property.plotArea <= state.maxArea
-      let dataset = state.status == 'All Data' || (state.status == "Active" && !property.inactiveReason)||(state.status == "Sold" && property.inactiveReason &&  property.inactiveReason.includes("SOLD")) || (state.status =="Inactive" && property.inactiveReason)
-      return (
-       price  && area && dataset
-        
-      );
-    });
-  }, [properties, state]);
-
-
+  
   const Pins = () => <>
-    {data.map((plot, index) => (
+    {state.filteredProperties.map((plot, index) => (
       <Marker
         key={`marker-${index}`}
         longitude={plot.location.split(',')[1]}

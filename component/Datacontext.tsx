@@ -1,42 +1,72 @@
 // components/DataContext.tsx
 import React, { createContext, useReducer, useContext, ReactNode } from 'react';
-
+import properties from "./data/data.json"
 // Define types for state
 type State = {
-  minValuePrice:number;
-  maxValuePrice:number;
-  minValueArea:number;
-  maxValueArea:number;
+  minValuePrice: number;
+  maxValuePrice: number;
+  minValueArea: number;
+  maxValueArea: number;
   minPrice: number;
   maxPrice: number;
   minArea: number;
   maxArea: number;
-  dataType: "Plain Data"|"Price Heatmap"|"Area Sold Heatmap";
-  status: "All Data"|"Inactive"| "Sold"|"Active";
-  style:"dark-v11"|"satellite-streets-v12"| "streets-v12"|"outdoors-v12"|"light-v11";
+  dataType: "Plain Data" | "Price Heatmap" | "Area Sold Heatmap";
+  status: "All Data" | "Inactive" | "Sold" | "Active";
+  style: "dark-v11" | "satellite-streets-v12" | "streets-v12" | "outdoors-v12" | "light-v11";
+  properties: any;
+  filteredProperties: any;
 };
 
 // Define action types
 type Action =
   | { type: 'UPDATE_PRICE_RANGE'; payload: { minPrice: number; maxPrice: number } }
   | { type: 'UPDATE_AREA_RANGE'; payload: { minArea: number; maxArea: number } }
-  | { type: 'UPDATE_DATA_TYPE'; payload: "Plain Data"|"Price Heatmap"|"Area Sold Heatmap" }
-  | { type: 'UPDATE_STATUS'; payload: "All Data"|"Inactive"| "Sold"|"Active" }
-  | { type: 'UPDATE_STYLE'; payload:"dark-v11"|"satellite-streets-v12"| "streets-v12"|"outdoors-v12"|"light-v11" };
+  | { type: 'UPDATE_DATA_TYPE'; payload: "Plain Data" | "Price Heatmap" | "Area Sold Heatmap" }
+  | { type: 'UPDATE_STATUS'; payload: "All Data" | "Inactive" | "Sold" | "Active" }
+  | { type: 'UPDATE_STYLE'; payload: "dark-v11" | "satellite-streets-v12" | "streets-v12" | "outdoors-v12" | "light-v11" };
 
+
+function minMax(items: any) {
+  return items.reduce((acc: any, val: any) => {
+    acc[0] = (acc[0] === undefined || val < acc[0]) ? val : acc[0]
+    acc[1] = (acc[1] === undefined || val > acc[1]) ? val : acc[1]
+    return acc;
+  }, []);
+}
+
+let findBound = (data: any) => {
+  let price: any = data.map((item: any) => item.price)
+  let area: any = data.map((item: any) => item.plotArea)
+
+  let minMaxPrice = minMax(price)
+  let minMaxArea = minMax(area)
+  return [minMaxPrice, minMaxArea]
+
+}
+
+
+let bounds = findBound(properties)
+console.log(bounds)
 // Initial state
 const initialState: State = {
-  minValueArea:0,
-  maxValueArea:40000,
-  minValuePrice:0,
-  maxValuePrice:100000000,
-  minPrice: 0,
-  maxPrice: 10000000,
-  minArea: 900,
-  maxArea: 2400,
+  minValueArea: bounds[1][0],
+  maxValueArea: bounds[1][1],
+
+  minArea: bounds[1][0],
+  maxArea: bounds[1][1],
+
+  minValuePrice: bounds[0][0],
+  maxValuePrice: bounds[0][1],
+
+  minPrice: bounds[0][0],
+  maxPrice: bounds[0][1],
+  
   dataType: 'Plain Data',
   status: 'All Data',
-  style:'dark-v11',
+  style: 'dark-v11',
+  properties: properties,
+  filteredProperties: properties
 };
 
 // Context creation
@@ -44,19 +74,53 @@ const DataContext = createContext<{ state: State; dispatch: React.Dispatch<Actio
 
 // Reducer function
 const dataReducer = (state: State, action: Action): State => {
+
+  let newState: any;
   switch (action.type) {
     case 'UPDATE_PRICE_RANGE':
-      return { ...state, minPrice: action.payload.minPrice, maxPrice: action.payload.maxPrice };
+      newState = { ...state, minPrice: action.payload.minPrice, maxPrice: action.payload.maxPrice };
+      break;
     case 'UPDATE_AREA_RANGE':
-      return { ...state, minArea: action.payload.minArea, maxArea: action.payload.maxArea };
+      newState = { ...state, minArea: action.payload.minArea, maxArea: action.payload.maxArea };
+      break;
+    case 'UPDATE_STATUS':
+      newState = { ...state, status: action.payload };
+      break;
+    case 'UPDATE_STYLE':
+      return { ...state, style: action.payload };
     case 'UPDATE_DATA_TYPE':
       return { ...state, dataType: action.payload };
-    case 'UPDATE_STATUS':
-      return { ...state, status: action.payload };
-    case 'UPDATE_STYLE':
-        return { ...state, style: action.payload };
     default:
       return state;
+  }
+
+ 
+  let nfilteredProperties = newState.properties.filter((property: any) => {
+    // Filter conditions based on minPrice, maxPrice, minArea, maxArea
+    let price = property.price >= newState.minPrice && property.price <= newState.maxPrice
+    let area = property.plotArea >= newState.minArea && property.plotArea <= newState.maxArea
+    let dataset = newState.status == 'All Data' || (newState.status == "Active" && !property.inactiveReason) || (newState.status == "Sold" && property.inactiveReason && property.inactiveReason.includes("SOLD")) || (newState.status == "Inactive" && property.inactiveReason)
+    return (
+      price && area && dataset
+
+    );
+  })
+  if(action.type != 'UPDATE_STATUS'){
+    return { ...newState, filteredProperties: nfilteredProperties }
+  }else{
+    let nbounds = findBound(nfilteredProperties) 
+    console.log(nbounds,nfilteredProperties.length )
+    return { ...newState, 
+
+      minValueArea:nbounds[1][0],
+      maxValueArea: nbounds[1][1],
+      minArea: nbounds[1][0],
+      maxArea: nbounds[1][1],
+      minValuePrice: nbounds[0][0],
+      maxValuePrice:nbounds[0][1],
+      minPrice: nbounds[0][0],
+      maxPrice: nbounds[0][1],
+      filteredProperties: nfilteredProperties }
   }
 };
 

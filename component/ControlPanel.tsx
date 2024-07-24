@@ -60,11 +60,10 @@ const ControlPanel: React.FC = () => {
             step={100000} 
             minValue={state.minValuePrice} 
             maxValue={state.maxValuePrice} 
-            formatOptions={{style: "currency", currency: "IND"}}
+  
             onChange={handlePriceChange}
             classNames={{
               track: "bg-default-500/30",
-              thumb: "w-2 h-2 after:w-2 after:h-2 ",
             }}
         />
         <Slider
@@ -76,7 +75,6 @@ const ControlPanel: React.FC = () => {
           onChange={handleAreaChange }
           classNames={{
             track: "bg-default-500/30",
-            thumb: "w-2 h-2 after:w-2 after:h-2 ",
           }}
         />
         <Select
