@@ -44,9 +44,12 @@ function minMax(items: any) {
 let findBound = (data: any) => {
   let price: any = data.map((item: any) => item.properties.price)
   let area: any = data.map((item: any) => item.properties.plotArea)
+  let pricePerArea: any = data.map((item: any) => item.properties.pricePerUnit)
 
   let minMaxPrice = minMax(price)
   let minMaxArea = minMax(area)
+  let minMaxPricePerArea = minMax(pricePerArea)
+  console.log(minMaxPricePerArea)
   return [minMaxPrice, minMaxArea]
 
 }

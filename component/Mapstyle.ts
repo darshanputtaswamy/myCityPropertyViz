@@ -10,7 +10,7 @@ export const heatmapLayer ={
                 'type': 'exponential',
                 'stops': [
                   [1, 0],
-                  [62, 1]
+                  [43500, 1]
                 ]
               },
               // increase intensity as zoom level increases

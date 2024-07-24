@@ -31,6 +31,10 @@ const PlotDetails = ({ data }: any) => {
           <p className="">Owner Description</p>
           <p className="overflow-y-scroll h-32">{data.ownerDescription}</p>
         </div>}
+        {data && <div className="m-2">
+          <p className="">Payload</p>
+          <p className="overflow-y-scroll h-32">{JSON.stringify(data)}</p>
+        </div>}
       </CardBody>
     </Card>
   );
