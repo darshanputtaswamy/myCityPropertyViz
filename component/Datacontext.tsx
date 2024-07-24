@@ -1,6 +1,12 @@
 // components/DataContext.tsx
 import React, { createContext, useReducer, useContext, ReactNode } from 'react';
 import properties from "./data/data.json"
+import geoJsonCoverter from "./data/geoJsonCoverter";
+
+
+let geoData = geoJsonCoverter(properties)
+ 
+
 // Define types for state
 type State = {
   minValuePrice: number;
@@ -36,8 +42,8 @@ function minMax(items: any) {
 }
 
 let findBound = (data: any) => {
-  let price: any = data.map((item: any) => item.price)
-  let area: any = data.map((item: any) => item.plotArea)
+  let price: any = data.map((item: any) => item.properties.price)
+  let area: any = data.map((item: any) => item.properties.plotArea)
 
   let minMaxPrice = minMax(price)
   let minMaxArea = minMax(area)
@@ -46,7 +52,7 @@ let findBound = (data: any) => {
 }
 
 
-let bounds = findBound(properties)
+let bounds = findBound(geoData)
 console.log(bounds)
 // Initial state
 const initialState: State = {
@@ -65,8 +71,8 @@ const initialState: State = {
   dataType: 'Plain Data',
   status: 'All Data',
   style: 'dark-v11',
-  properties: properties,
-  filteredProperties: properties
+  properties: geoData,
+  filteredProperties: geoData
 };
 
 // Context creation
@@ -97,9 +103,9 @@ const dataReducer = (state: State, action: Action): State => {
  
   let nfilteredProperties = newState.properties.filter((property: any) => {
     // Filter conditions based on minPrice, maxPrice, minArea, maxArea
-    let price = property.price >= newState.minPrice && property.price <= newState.maxPrice
-    let area = property.plotArea >= newState.minArea && property.plotArea <= newState.maxArea
-    let dataset = newState.status == 'All Data' || (newState.status == "Active" && !property.inactiveReason) || (newState.status == "Sold" && property.inactiveReason && property.inactiveReason.includes("SOLD")) || (newState.status == "Inactive" && property.inactiveReason)
+    let price = property.properties.price >= newState.minPrice && property.properties.price <= newState.maxPrice
+    let area = property.properties.plotArea >= newState.minArea && property.properties.plotArea <= newState.maxArea
+    let dataset = newState.status == 'All Data' || (newState.status == "Active" && !property.properties.inactiveReason) || (newState.status == "Sold" && property.properties.inactiveReason && property.properties.inactiveReason.includes("SOLD")) || (newState.status == "Inactive" && property.properties.inactiveReason)
     return (
       price && area && dataset
 

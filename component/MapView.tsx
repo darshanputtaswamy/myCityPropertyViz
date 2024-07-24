@@ -3,7 +3,7 @@
 import Image from "next/image";
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { NextUIProvider, Button } from "@nextui-org/react";
-
+import {heatmapLayer} from './Mapstyle';
 import Pin from './Icons/PinIcon';
 import PlotDetails from './Popup'
 import Map, {
@@ -12,7 +12,9 @@ import Map, {
   NavigationControl,
   FullscreenControl,
   ScaleControl,
-  GeolocateControl
+  GeolocateControl,
+  Source,
+  Layer
 } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import ControlPanel from './ControlPanel';
@@ -35,17 +37,15 @@ export default function MapView() {
     {state.filteredProperties.map((plot, index) => (
       <Marker
         key={`marker-${index}`}
-        longitude={plot.location.split(',')[1]}
-        latitude={plot.location.split(',')[0]}
+        longitude={plot.geometry.coordinates[0]}
+        latitude={plot.geometry.coordinates[1]}
         anchor="bottom"
         onClick={e => {
-          // If we let the click event propagates to the map, it will immediately close the popup
-          // with `closeOnClick: true`
           e.originalEvent.stopPropagation();
-          setPopupInfo(plot);
+          setPopupInfo(plot.properties);
         }}
       >
-        <Pin selected={popupInfo && popupInfo.id == plot.id} />
+        <Pin selected={popupInfo && popupInfo.id == plot.properties.id} />
       </Marker>
     ))}
   </>
@@ -67,7 +67,18 @@ export default function MapView() {
 
           <ScaleControl />
 
-          <Pins />
+          
+          {state.dataType == "Plain Data" && (state.filteredProperties && (<Pins />))}
+          {state.dataType == "Price Heatmap" && (state.filteredProperties && (
+
+          <Source id="propertyInfo" type="geojson"  data={{
+            "type": "FeatureCollection",
+            "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+            "features": [...state.filteredProperties]
+        }}>
+            <Layer id='waterway-label' {...heatmapLayer} />
+          </Source>
+          ))}
 
         </Map>
 
