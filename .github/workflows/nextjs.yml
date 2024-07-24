@@ -73,11 +73,11 @@ jobs:
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: Reading a environment variable from github repo
-        run: echo "Reading variable ${{ vars.NEXT_PUBLIC_MAPBOX_TOKEN }}"
+        run: echo "Reading variable ${{ vars.MAPBOX_TOKEN }}"
       - name: create .env file 
         run: |
           touch .env
-          echo NEXT_PUBLIC_MAPBOX_TOKEN=${{ vars.NEXT_PUBLIC_MAPBOX_TOKEN }} >> .env.local
+          echo NEXT_PUBLIC_MAPBOX_TOKEN=${{ vars.MAPBOX_TOKEN }} >> .env.local
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
       - name: Upload artifact
